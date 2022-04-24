@@ -11,27 +11,30 @@ function Table() {
     filterByNumericValues,
     setFilterByNumericValues,
     getByNumericValues,
-    setGetingByNumericValues } = useContext(StarWarsContext);
+    setGetingByNumericValues,
+    selectAll,
+    setSelectAll } = useContext(StarWarsContext);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const [dataSecundario, setDataSecundario] = useState([]);
-  // const [filterByName, setFilterByName] = useState('');
-  // const [filterByNumericValues, setFilterByNumericValues] = useState([]);
-  // const [getByNumericValues, setGetingByNumericValues] = useState([]);
-  // const teste = () => {
-  //   if (data.planets.length > 0) {
-  //     setDataSecundario(data.planets);
-  //   }
-  // };
-
   useEffect(() => {
     async function getPlanets() {
       await fetchPlanets();
     }
     getPlanets();
-    // teste();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  //   console.log(data);
+
+  const teste = (prevSelect) => {
+    // console.log(prevSelect);
+    const selectFilter = selectAll.select.filter((element) => (
+      element !== prevSelect
+    ));
+    // console.log(selectFilter);
+    setSelectAll({
+      select: selectFilter,
+    });
+  };
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const filterPlanet = () => {
     setDataSecundario(data.planets);
@@ -40,8 +43,11 @@ function Table() {
         .filter((planet) => (planet.name.includes(filterByName)));
       setDataSecundario(filterName);
     }
-    if (dataSecundario.length > 0 && getByNumericValues.length > 0) {
-      setDataSecundario(getByNumericValues);
+    if (dataSecundario.length > 0 && getByNumericValues.planetFilter.length > 0) {
+      setDataSecundario(getByNumericValues.planetFilter);
+    }
+    if (filterByNumericValues) {
+      teste(filterByNumericValues.column);
     }
   };
 
@@ -61,33 +67,40 @@ function Table() {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const filterNumericValues = () => {
+    // console.log(typeof filterByNumericValues);
     const filter = dataSecundario.filter((planet) => {
       const operador = filterByNumericValues.comparison;
       // const column = filterByNumericValues.column;
       // console.log(operador);
-      // console.log(filterByNumericValues);
+      // console.log(filterByNumericValues );
       if (operador === 'maior que') {
         const maiorQue = parseInt(planet[filterByNumericValues.column], 10)
           > parseInt(filterByNumericValues.value, 10);
-        // console.log(maiorQue);
+        console.log(maiorQue);
         return (maiorQue) && planet;
       } if (operador === 'menor que') {
         const menorQue = parseInt(planet[filterByNumericValues.column], 10)
           < parseInt(filterByNumericValues.value, 10);
-        // console.log(menorQue);
+        console.log(menorQue);
         return (menorQue) && planet;
       } if (operador === 'igual a') {
         const igualA = parseInt(planet[filterByNumericValues.column], 10)
         === parseInt(filterByNumericValues.value, 10);
-        // console.log(igualA);
+        console.log(igualA);
         return (igualA) && planet;
       }
       return filter;
     });
+
     // console.log(filter);
-    setGetingByNumericValues(filter);
-    // setDataSecundario(filter);
+    setGetingByNumericValues({
+      planetFilter: filter,
+      filterSelect: [...getByNumericValues.filterSelect, filterByNumericValues] });
+    // setDataSecundario(filter);]
     // console.log(getByNumericValues);
+    // if (getByNumericValues.filterSelect.length > 0) {
+    //   teste();
+    // }
     filterPlanet();
   };
 
@@ -95,8 +108,10 @@ function Table() {
   useEffect(() => filterPlanet(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [filterByName,
-      getByNumericValues,
+      getByNumericValues.planetFilter,
+      getByNumericValues.filterSelect,
       data]);
+
   return (
     <div>
       <input
@@ -110,18 +125,22 @@ function Table() {
       <select
         data-testid="column-filter"
         onChange={ setValueColumn }
+        // onClick={ () => setDataSecundario(data.planets) }
       >
-        <option>population</option>
+        {selectAll.select.map((element, i) => (
+          <option key={ i }>{element}</option>
+        ))}
+        {/* <option>population</option>
         <option>orbital_period</option>
         <option>diameter</option>
         <option>rotation_period</option>
-        <option>surface_water</option>
+        <option>surface_water</option> */}
       </select>
       <select
         data-testid="comparison-filter"
         onChange={ setValueComparison }
       >
-        <option>maior que</option>
+        <option selected>maior que</option>
         <option>menor que</option>
         <option>igual a</option>
       </select>
@@ -141,6 +160,24 @@ function Table() {
       >
         Adicionar filtro
       </button>
+      <br />
+      {(getByNumericValues.filterSelect.length > 0)
+      && (getByNumericValues.filterSelect.map((element, i) => (
+        <div key={ i }>
+          <p>
+            { element.column}
+          </p>
+          <p>
+            { element.comparison}
+          </p>
+          <p>
+            { element.value}
+          </p>
+        </div>
+      ))
+
+      )}
+
       <table>
         <thead>
           <tr>
