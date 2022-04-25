@@ -8,7 +8,11 @@ function StarWarsProvider({ children }) {
     planets: [],
   });
   const [filterByName, setFilterByName] = useState('');
-  const [filterByNumericValues, setFilterByNumericValues] = useState([]);
+  const [filterByNumericValues, setFilterByNumericValues] = useState({
+    column: 'population',
+    comparison: 'maior que',
+    value: 0,
+  });
   const [getByNumericValues, setGetingByNumericValues] = useState({
     planetFilter: [],
     filterSelect: [],

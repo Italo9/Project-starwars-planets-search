@@ -23,18 +23,14 @@ function Table() {
     getPlanets();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const teste = (prevSelect) => {
-    // console.log(prevSelect);
+  const optionFilter = (prevSelect) => {
     const selectFilter = selectAll.select.filter((element) => (
       element !== prevSelect
     ));
-    // console.log(selectFilter);
     setSelectAll({
       select: selectFilter,
     });
   };
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const filterPlanet = () => {
     setDataSecundario(data.planets);
@@ -46,9 +42,13 @@ function Table() {
     if (dataSecundario.length > 0 && getByNumericValues.planetFilter.length > 0) {
       setDataSecundario(getByNumericValues.planetFilter);
     }
-    if (filterByNumericValues) {
-      teste(filterByNumericValues.column);
-    }
+  };
+
+  const removeFilters = () => {
+    setGetingByNumericValues((prevState) => ({
+      ...prevState,
+      filterSelect: [],
+    }));
   };
 
   const setValueColumn = (e) => {
@@ -67,41 +67,48 @@ function Table() {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const filterNumericValues = () => {
-    // console.log(typeof filterByNumericValues);
-    const filter = dataSecundario.filter((planet) => {
+    // if (filterByNumericValues.length === 0) {
+    //   setGetingByNumericValues((prevState) => ({
+    //     ...prevState,
+    //   }));
+    // } else {
+    const filter = data.planets.filter((planet) => {
       const operador = filterByNumericValues.comparison;
-      // const column = filterByNumericValues.column;
-      // console.log(operador);
-      // console.log(filterByNumericValues );
       if (operador === 'maior que') {
         const maiorQue = parseInt(planet[filterByNumericValues.column], 10)
           > parseInt(filterByNumericValues.value, 10);
-        console.log(maiorQue);
         return (maiorQue) && planet;
       } if (operador === 'menor que') {
         const menorQue = parseInt(planet[filterByNumericValues.column], 10)
           < parseInt(filterByNumericValues.value, 10);
-        console.log(menorQue);
         return (menorQue) && planet;
       } if (operador === 'igual a') {
         const igualA = parseInt(planet[filterByNumericValues.column], 10)
         === parseInt(filterByNumericValues.value, 10);
-        console.log(igualA);
         return (igualA) && planet;
       }
       return filter;
     });
 
-    // console.log(filter);
     setGetingByNumericValues({
       planetFilter: filter,
       filterSelect: [...getByNumericValues.filterSelect, filterByNumericValues] });
-    // setDataSecundario(filter);]
-    // console.log(getByNumericValues);
-    // if (getByNumericValues.filterSelect.length > 0) {
-    //   teste();
     // }
     filterPlanet();
+    optionFilter(filterByNumericValues.column);
+  };
+
+  const deleteFilterView = (prevSelect) => {
+    const deleteFilter = getByNumericValues.filterSelect.filter((element) => (
+      element !== prevSelect
+    ));
+    console.log(deleteFilter);
+    setGetingByNumericValues((prevState) => ({
+      ...prevState,
+      filterSelect: deleteFilter,
+    }));
+    setFilterByNumericValues(deleteFilter[2]);
+    // filterNumericValues();
   };
 
   //   eslint-disable-next-line react-hooks/exhaustive-deps
@@ -128,27 +135,22 @@ function Table() {
         // onClick={ () => setDataSecundario(data.planets) }
       >
         {selectAll.select.map((element, i) => (
-          <option key={ i }>{element}</option>
+          <option key={ i } defaultValue={ element }>{element}</option>
         ))}
-        {/* <option>population</option>
-        <option>orbital_period</option>
-        <option>diameter</option>
-        <option>rotation_period</option>
-        <option>surface_water</option> */}
       </select>
       <select
         data-testid="comparison-filter"
         onChange={ setValueComparison }
       >
-        <option selected>maior que</option>
-        <option>menor que</option>
-        <option>igual a</option>
+        <option defaultValue="maior que">maior que</option>
+        <option defaultValue="menor que">menor que</option>
+        <option defaultValue="igual a">igual a</option>
       </select>
       <input
         type="number"
         name="name"
         data-testid="value-filter"
-        // value={ filterByName }
+        defaultValue={ 0 }
         placeholder="Escreva o numero"
         onChange={ SetNumberValue }
       />
@@ -156,27 +158,46 @@ function Table() {
         type="button"
         data-testid="button-filter"
         onClick={ filterNumericValues }
-        disabled={ filterByNumericValues.length === 0 }
+        // disabled={ filterByNumericValues.length === 0 }
       >
         Adicionar filtro
       </button>
       <br />
       {(getByNumericValues.filterSelect.length > 0)
-      && (getByNumericValues.filterSelect.map((element, i) => (
-        <div key={ i }>
-          <p>
-            { element.column}
-          </p>
-          <p>
-            { element.comparison}
-          </p>
-          <p>
-            { element.value}
-          </p>
-        </div>
-      ))
+        && (getByNumericValues.filterSelect.map((element, i) => (
+          <div
+            key={ i }
+            data-testid="filter"
+          >
+            <p>
+              { element.column}
+            </p>
+            <p>
+              { element.comparison}
+            </p>
+            <p>
+              { element.value}
+            </p>
+            <button
+              type="button"
+              onClick={ () => deleteFilterView(element) }
+              data-testid="button-remove-filters"
+            >
+              x
 
-      )}
+            </button>
+          </div>
+        ))
+
+        )}
+      <button
+        type="button"
+        data-testid="button-remove-filters"
+        onClick={ removeFilters }
+      >
+        Remover todas filtragens
+
+      </button>
 
       <table>
         <thead>
