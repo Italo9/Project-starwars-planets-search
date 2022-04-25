@@ -89,7 +89,6 @@ function Table() {
       }
       return filter;
     });
-
     setGetingByNumericValues({
       planetFilter: filter,
       filterSelect: [...getByNumericValues.filterSelect, filterByNumericValues] });
