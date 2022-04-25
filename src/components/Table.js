@@ -72,7 +72,7 @@ function Table() {
     //     ...prevState,
     //   }));
     // } else {
-    const filter = data.planets.filter((planet) => {
+    const filter = dataSecundario.filter((planet) => {
       const operador = filterByNumericValues.comparison;
       if (operador === 'maior que') {
         const maiorQue = parseInt(planet[filterByNumericValues.column], 10)
